@@ -164,12 +164,12 @@ function check_condn(info_objects){
 
   for(let key in info_objects){
     if (info_objects[key].age>18 && info_objects[key].genders=="male"){
-      console.log(info_objects[key])
+      return info_objects[key];
     }
   }
 
 }
-check_condn((info_objects));
+console.log(check_condn((info_objects)));
 
 
 
