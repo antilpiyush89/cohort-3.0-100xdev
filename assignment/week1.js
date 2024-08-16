@@ -98,7 +98,7 @@ great(user1);
 function great_vote(user1){
   console.log("Hi " + user1.firstname + " your age is " + user1.age + " and your gender is " + user1.gender);
 
-  if (age >= 18) {
+  if (user1.age >= 18) {
     return "you can vote";
   } else {
     return "you can not vote";
