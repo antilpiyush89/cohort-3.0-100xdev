@@ -125,3 +125,37 @@ async function main(){
   });
 }
 main();
+
+
+//err first callback
+const fs=require('fs')
+fs.readFile("a.txt","utf-8",function(err,data){
+  if(err){
+    console.log("Error reading file")
+  }else{
+    console.log(data)
+  }
+});
+
+//reject in promises and also promisified version of fs.readFile
+const fs=require('fs');
+
+function readfilepromisified(filename){
+  return new Promise(function(resolve,reject){
+    fs.readFile(filename,"utf-8",function(err,data){
+      if(err){
+        reject("Error reading file");
+      }else{
+        resolve(data);
+      }
+    })
+  })
+};
+
+function ondone(data){
+  console.log(data);
+}
+function error(err){
+  console.log(err);
+}
+readfilepromisified("a.txt").then(ondone).catch(error);
