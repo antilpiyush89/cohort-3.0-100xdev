@@ -139,6 +139,7 @@ fs.readFile("a.txt","utf-8",function(err,data){
 
 //reject in promises and also promisified version of fs.readFile
 const fs=require('fs');
+const { setDefaultHighWaterMark } = require('stream');
 
 function readfilepromisified(filename){
   return new Promise(function(resolve,reject){
@@ -159,3 +160,14 @@ function error(err){
   console.log(err);
 }
 readfilepromisified("a.txt").then(ondone).catch(error);
+
+
+//Promisified version of setTimeout
+function callback(){
+  console.log("3 second have passed")
+}
+function setTimeoutPromisified(ms){
+  return (resolve=>setTimeout(resolve,ms));
+}
+
+setTimeoutpromisified(3000).then(callback);
