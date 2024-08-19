@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="todoparent">
+    <h1>Todo List</h1>
+    <div id="todo-1">
+      <h4>1. Get Panner</h4>
+      <button onclick="delete_todo(1)" style="display:flex;">Delete</button>
+    </div>
+    <div id="todo-2">
+      <h4>2. Workout</h4>
+      <button onclick="delete_todo(2)" style="display:flex;">Delete</button>
+    </div>
+    
+    
+
+  </div>
+  
+
+  <!-- <input type="text" placeholder="Add your Todo here">
+  <button onclick="AddTodo()">Add todo</button> -->
+  <script>    
+    // To delete the html element
+    function delete_todo(index){
+      const element=document.getElementById("todo-"+index);
+      document.getElementById("todoparent").removeChild(element);
+    }
+    //Appending element at the end
+    // const div1=document.createElement("div");
+    // div1.innerHTML="Hello Ji";
+    // // This just creates the div and add value to it but it doesn't add it to the website
+    // //To add it we do
+    // document.querySelector("body").appendChild(div1);
+
+  </script>
+</body>
+</html>
