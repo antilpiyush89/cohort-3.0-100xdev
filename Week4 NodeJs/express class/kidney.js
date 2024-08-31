@@ -10,7 +10,7 @@ const users = [{
 // GET Request
 app.get("/", function (req, res) {
   const johnkidney = users[0].kidney; //   kidney:{healthy:false} access this
-  const noOfKidney = Object.keys(johnkidney).length // =1
+  const noOfKidney = johnkidney.length // =1
   let noOfHealthyKidney = 0;
   for (let i = 0; i < johnkidney.length; i++) {
     if (johnkidney[i].healthy) {
@@ -18,11 +18,6 @@ app.get("/", function (req, res) {
     }
   }
 
-  // Let's break down the line let noOfHealthyKidney = johnkidney.healthy ? 1 : 0; step by step:
-  // johnkidney.healthy: This accesses the healthy property of the johnkidney object, which is a boolean value (true or false).
-  // ?: This is the conditional operator (also known as the ternary operator). It's a shorthand way of writing an if-else statement.
-  // 1: This is the value that will be assigned to noOfHealthyKidney if the condition johnkidney.healthy is true.
-  // : 0: This is the value that will be assigned to noOfHealthyKidney if the condition johnkidney.healthy is false.
 
   // use ctrl+c to stop the server
 
