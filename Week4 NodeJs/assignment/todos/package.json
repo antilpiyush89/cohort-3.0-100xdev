@@ -1,0 +1,12 @@
+{
+  "name": "todos",
+  "version": "1.0.0",
+  "main": "todos.js",
+  "scripts": {
+    "test-todoServer": "node todos.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

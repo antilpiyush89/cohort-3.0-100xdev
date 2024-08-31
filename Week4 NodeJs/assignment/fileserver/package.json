@@ -1,0 +1,12 @@
+{
+  "name": "fileserver",
+  "version": "1.0.0",
+  "main": "fileserver.js",
+  "scripts": {
+    "test-fileServer": "node fileServer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
