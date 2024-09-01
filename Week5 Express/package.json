@@ -1,0 +1,12 @@
+{
+  "name": "week5-express",
+  "version": "1.0.0",
+  "main": "fetch._api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
