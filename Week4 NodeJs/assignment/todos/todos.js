@@ -137,5 +137,8 @@ app.delete("/todos/:id",(req,res)=>{
   }
 
 })
-
+// Catch all other routes and return 404
+app.use((req, res) => {
+  res.status(404).send('Route not found');
+});
 app.listen(3006)
