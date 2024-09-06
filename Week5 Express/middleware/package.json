@@ -1,0 +1,17 @@
+{
+  "name": "middleware",
+  "version": "1.0.0",
+  "main": "Ass1.js",
+  "scripts": {
+    "Ass1": "node Ass1.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {},
+  "description": ""
+}
