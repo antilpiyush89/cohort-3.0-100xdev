@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Website</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+
+  <style>
+    .parentdiv {
+      margin-top: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+    }
+
+    .childdiv {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgb(248, 246, 246);
+      width: 500px;
+      height: 400px;
+      border-radius: 25px;
+      box-shadow: 2px 2px 10px grey;
+
+    }
+
+    p {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: 40px;
+      font-weight: 500;
+    }
+
+    #signup-username,
+    #signup-password,
+    #signin-username,
+    #signin-password {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin-bottom: 20px;
+      width: 360px;
+      padding-left: 30px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      font-size: 18px;
+      border-radius: 12px;
+      border-width: 1px;
+      border-color: rgb(194, 200, 208);
+      border-style: solid;
+      outline: none;
+    }
+
+    #signup-username:focus,
+    #signup-password:focus,
+    #signin-username:focus,
+    #signin-password:focus {
+      border-color: rgb(16, 163, 127)
+    }
+
+    .submit:hover {
+      background-color: rgb(15, 149, 116);
+    }
+
+    .submit {
+      color: white;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: 18px;
+      border-radius: 8px;
+      width: 390px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      border: none;
+      background-color: rgb(16, 163, 127);
+
+
+    }
+
+    #title {
+      font-size: 30px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-weight: 400;
+
+    }
+
+    .p1,
+    .p2 {
+      font-size: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-weight: 100;
+
+    }
+
+    .p2 {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <script>
+    //1
+    let count = 0;
+    render("signup-username", "signup-password", "Create An Account")
+
+    //2
+    
+    function render(id1, id2, title) {
+      const Div = content(id1, id2, title); // store the returned parentdiv element
+      document.body.innerHTML = '';
+      document.body.appendChild(Div);
+      const button = Div.querySelector('.submit'); // get the button element
+
+      // Remove any existing event listeners
+      button.removeEventListener('click', signup);
+      button.removeEventListener('click', signin);
+
+      if (count == 0) {
+        count += 1;
+        
+        button.addEventListener('click', signup); // add the event listener
+      }
+      if (count == 1) {
+        button.addEventListener('click', signin); // add the event listener
+      }
+
+
+
+    }
+
+    //3
+    function content(id1, id2, title) {
+      const parentdiv = document.createElement("div"); //<div></div> is created
+      const childdiv = document.createElement("div"); //<div></div> is created
+      parentdiv.setAttribute("class", "parentdiv");
+      childdiv.setAttribute("class", "childdiv");
+      const p = document.createElement('p');
+      const username_input = document.createElement("input")
+      const password_input = document.createElement("input")
+      const button = document.createElement("button");
+      username_input.setAttribute("id", id1);
+      password_input.setAttribute("id", id2);
+      username_input.placeholder="Username";
+      password_input.placeholder="Password";
+      username_input.type = "text";
+      password_input.type = "password";
+      p.innerHTML = title;
+      button.innerHTML = "Submit";
+      button.setAttribute("class", "submit");
+
+      // I just added h1 to divContent, then button to divDelete, then added both divContent and divDelete into div
+      childdiv.append(p);
+      childdiv.append(username_input);
+      childdiv.append(password_input);
+      childdiv.append(button);
+
+      parentdiv.append(childdiv)
+      return parentdiv
+    }
+
+
+
+
+    //4
+    async function signup() {
+      const username = document.getElementById("signup-username").value
+      const password = document.getElementById("signup-password").value
+      await axios.post("http://localhost:3000/signup", { // sending request using axios, just like we send request using postman
+        username: username, // exactly like we do in the body of postman
+        password: password
+      }) // Promise under the hood, it can take x sec, hence we await 
+      alert("you are signed Up");
+      render("signin-username", "signin-password", "Welcome Back")
+    }
+
+    //5
+    async function signin() {
+      const username = document.getElementById("signin-username").value
+      const password = document.getElementById("signin-password").value
+      const response = await axios.post("http://localhost:3000/signin", { // sending request using axios, just like we send request using postman
+        username: username, // exactly like we do in the body of postman
+        password: password
+      }) // Promise under the hood, it can take x sec, hence we await 
+
+      localStorage.setItem("token", response.data.token)
+      //response.data: This property contains the actual data returned by the server. In this case, it's an object that contains the token generated by the server for the signed-in user.
+
+      //Inspect -> Application -> Localstorage ke ander jwt ko store kar rahe hain, browser ke ander hi
+      // Session persist till you logout, for however times you reload the website the session presist the token remain same, when you logout token get removed, when you login again you get a new token
+      alert("you are signed In");
+      render_userinfo();
+
+    }
+
+    //6
+    function render_userinfo() {
+      getuserinfo().then(response => {
+        const userinfoDiv = userinfo_content(response.data.username, response.data.password);
+        document.body.innerHTML = '';
+        document.body.appendChild(userinfoDiv);
+        const button = userinfoDiv.querySelector('.submit');
+        button.onclick = () => logout();
+      });
+    }
+
+    //7
+    //when you reload the page
+    async function getuserinfo() {
+      const response = await axios.get("http://localhost:3000/me", {
+        headers: { // bcz ham req.headers.token karte h in backend
+          token: localStorage.getItem("token") // fetches the token value from local storage
+        }
+      }) // request mein headers bhejne hi padenge, read Auth_JWT_middleware /me code, headers se token ko authorise karega aur username aur password nikalega
+      return response
+
+    }
+
+    //8
+    function userinfo_content(user, pass) {
+      const parentdiv = document.createElement("div"); //<div></div> is created
+      const childdiv = document.createElement("div"); //<div></div> is created
+      const p = document.createElement('p');
+      const p1 = document.createElement('p');
+      const p2 = document.createElement('p');
+      const button = document.createElement("button");
+      parentdiv.setAttribute("class", "parentdiv");
+      childdiv.setAttribute("class", "childdiv");
+      p.setAttribute('id', 'title');
+      p1.setAttribute("class", "p1");
+      p2.setAttribute("class", "p2");
+      button.setAttribute("class", "submit");
+      button.innerHTML = "Logout";
+      p.innerHTML = "User Details"
+      p1.innerHTML = "Username: " + user;
+      p2.innerHTML = "Password: " + pass;
+
+      // I just added h1 to divContent, then button to divDelete, then added both divContent and divDelete into div
+      childdiv.append(p);
+      childdiv.append(p1);
+      childdiv.append(p2);
+      childdiv.append(button);
+      parentdiv.append(childdiv)
+      return parentdiv
+    }
+
+
+    //9
+    function logout() {
+      localStorage.removeItem("token") //token is removed hence logout
+      alert("You are logged out");
+      console.log(count);
+      count=0;
+      render("signup-username", "signup-password", "Create An Account");
+    }
+
+  </script>
+</body>
+
+</html>
