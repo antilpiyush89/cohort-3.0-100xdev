@@ -1,10 +1,11 @@
 const mongoose=require("mongoose")
+const { string } = require("zod")
 const schema=mongoose.Schema
 const ObjectID= mongoose.ObjectId
 
 const USER= new schema({
   
-  email: String,
+  email: {type:String, unique:true},
   password: String,
   fullname: String
 })
