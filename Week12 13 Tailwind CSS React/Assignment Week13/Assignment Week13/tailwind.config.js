@@ -4,16 +4,9 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode:"selector",
   theme: {
-    extend: {
-      blue:{
-        800:"#18395f",
-        900:"#00274e"
-      },
-      green:{
-        500:"#3cdbc7"
-      }
-    },
+    extend: {},
   },
   plugins: [],
 }
