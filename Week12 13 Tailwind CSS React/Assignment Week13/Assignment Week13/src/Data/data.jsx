@@ -29,7 +29,7 @@ export const SidebarData=[{
 
 
 export const UserProfileData=[
-  {title:"Piyush Antil",img:"https://i.ibb.co/TPnvc7c/Whats-App-Image-2024-12-19-at-12-10-09-PM.jpg",email:"antilpiyush@gmail.com",phone:"8368180676",location:"Delhi,India"},]
+  {title:"Piyush Antil",img:"https://i.ibb.co/3fJZbdr/Whats-App-Image-2024-12-20-at-5-02-03-PM.jpg" ,email:"antilpiyush@gmail.com",phone:"8368180676",location:"Delhi,India"},]
   
 export const ScheduleData=[
   {time:"11:30 AM",time2:"11:30 AM",type:"Live",title:"UX Webinar",camera:<Camera/>},
