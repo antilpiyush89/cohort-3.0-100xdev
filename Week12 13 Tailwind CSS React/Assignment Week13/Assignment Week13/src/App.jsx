@@ -108,7 +108,7 @@ function MainContent({ }) {
       {/*  */}
       <div className="grid grid-cols-11 gap-8 p-8">
         <div className="h-96 md:col-span-3 col-span-11 bg-white -translate-y-24 rounded-2xl shadow-lg md:block hidden overflow-hidden">
-          <div className="flex justify-center mb-10 pt-10"><img src={UserProfileData[0].img} alt="user-image" className="h-40 w-48 rounded-xl object-cover object-top" /></div>
+          <div className="flex justify-center mb-10 pt-10"><img src={UserProfileData[0].img} alt="user-image" className="h-40 w-40 rounded-full object-cover object-top" /></div>
           <h1 className="font-sans font-medium text-sm text-bold mb-3 text-center">{UserProfileData[0].title}</h1>
           <h1 className="font-sans font-medium text-gray-500 text-sm text-center mb-1">{UserProfileData[0].email}</h1>
           <h1 className="font-sans font-medium text-gray-500 text-sm text-center mb-4">{UserProfileData[0].phone}</h1>
