@@ -32,7 +32,7 @@ export const Authentication = (req:Request,res:Response,next:NextFunction)=>{
     }else{
       // 2. This line of code gives me the payload, which in our case it is {username:username}
       const auth = jwt.verify(token,JWT_SECRET)
-      req.user= auth.username
+      req.user= auth
       // 3. If the token is invalid/wrong token provided jwt.verify throws an error and code execution goes to catch
       next()
     }

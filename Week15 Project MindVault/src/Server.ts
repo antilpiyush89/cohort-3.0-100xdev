@@ -5,7 +5,7 @@ import { HashPasswordGenerator, HashPasswordMatcher } from "./Middleware";
 const JWT_SECRET= "SOULSOCIETY"
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Authentication } from "./Middleware";
-
+import mongoose from "mongoose";
 
 const app = express(); // Initializing an empty express application
 app.use(express.json()) // As the user is sending the body in json, hence app.use is used to parse the body
@@ -71,7 +71,7 @@ app.post("/api/v1/signin", async (req,res)=>{
     const userFound = await UserModel.findOne({
       username:username
     })
-    if(!userFound || !userFound.password) {
+    if(!userFound || !userFound?.password) {
       // Checks if userFound is null or undefined and same for password field, this make sures even if the userFound has some value, it still checks if the password is null or undefined/ empty password field
       res.status(404).json({
         message:"User doesn't exist or password field is empty"
@@ -102,7 +102,7 @@ app.post("/api/v1/signin", async (req,res)=>{
 app.post("/api/v1/content",Authentication,async (req,res)=>{
   try{
     const title= req.body.title
-    const type = req.body.title
+    const type = req.body.type
     const link = req.body.link
     // In typescript type of req.user is not particularly defined so we defined it by saying treat req.user as jwt.JwtPayload, treat it as a JwtPayload and then the req.user may have null(empty value) or can be undefined(that its variable is declared but not initialised with any value ex- let x, then console.log(x), it will return undefined or function foo(){ } console.log(foo()). it will return undefined 
     // the ? represent that it may have null|undefined basically setting it as optional
@@ -111,14 +111,14 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
     const username=  (req.user as jwt.JwtPayload)?.username
     const tags = req.body.tags
     console.log("User: ",username)
-    const User = await UserModel.findOne({username:username.username})
- 
+    const User = await UserModel.findOne({username:username})
+
     // User can be possibly be null, so you have to handle it
     // if(User) means if user is not null
     // For database error it would go in catch(e)
     if(User){
       await TagModel.create({
-        tags:tags,
+        title:tags,
         userId:User._id
       })
       await ContentModel.create({
@@ -126,6 +126,9 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
         title:title,
         type:type,
         link:link,
+      })
+      res.status(200).json({
+        msg:"Content added successfully"
       })
     }else{
       //If User is null it would go here, 404 not found in Database
@@ -145,9 +148,28 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
 
   
 })
-app.get("/api/v1/content",Authentication,(req,res)=>{
-  
+app.get("/api/v1/content",Authentication,async(req,res) =>{
+  try{
+    const user = ( req.user as jwt.JwtPayload)?.username
+    const UserTable =  await UserModel.findOne({username:user})
+      const ContentTable = await ContentModel.findOne({userId:UserTable?._id}) // this ? is for optional cases for what if UserTable if null | undefined what if couldn't find user with username:user
+      const TagsTable = await TagModel.findOne({userId:UserTable?._id})
+      res.status(200).json({
+        msg:"Content Fetched Successfully",
+        title:ContentTable?.title,
+        type:ContentTable?.type,
+        link:ContentTable?.link,
+        tags:TagsTable?.title
+      })
+    }catch(e){
+      res.status(500).json({
+        msg:"Internal Server Error",
+        error:e
+      })
+    }
+
 })
+
 app.delete("/api/v1/content",Authentication,(req,res)=>{
   
 })
