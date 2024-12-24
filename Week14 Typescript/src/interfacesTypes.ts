@@ -52,6 +52,12 @@
 //   age:number
 // }
 
+// Marking a property of a Interface Optional by adding ? after the property name
+// interface UserInterface{
+//   name:string,
+//   age?:number // age is optional
+// }
+
 // function two(user:UserInterface){
 //   console.log(`Hello ${user.name}, you are ${user.age} years old`)
 // }
