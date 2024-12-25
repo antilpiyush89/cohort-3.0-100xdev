@@ -37,7 +37,9 @@ export const Authentication = (req:Request,res:Response,next:NextFunction)=>{
     }else{
       // 2. This line of code gives me the payload, which in our case it is {username:username}
       const auth = jwt.verify(token,JWT_SECRET)
-      req.user= auth
+      console.log(auth)
+      req.user= (auth as jwt.JwtPayload)?.userId
+      console.log(req.user)
       // 3. If the token is invalid/wrong token provided jwt.verify throws an error and code execution goes to catch
       next()
     }
@@ -57,19 +59,19 @@ export const Authentication = (req:Request,res:Response,next:NextFunction)=>{
 
 
 
-export const NewContentInContentandTagTable = async (username:string,title:string,type:string,link:string,TagName:string[])=>{
+export const NewContentInContentandTagTable = async (userId:string,title:string,type:string,link:string,TagName:string[])=>{
   try{
-  const UserPassDocument = await UserModel.findOne({username:username})
+  // const UserPassDocument = await UserModel.findOne({username:username})
   // fetches the latest document with latestContentID, as -1 represent the last element
-  const latestContentID = await ContentModel.findOne({userId:UserPassDocument?._id}).sort({contentID:-1}).select('contentID') 
+  const latestContentID = await ContentModel.findOne({userId:userId}).sort({contentID:-1}).select('contentID') 
   // If contentID exist it will add 1 to it, else sets a default value of 1 to contentID
   const NewContentID = latestContentID ? latestContentID.contentID + 1: 1
   console.log(NewContentID)
 
-  NewTagInTagTable(UserPassDocument?._id as ObjectId | undefined, TagName as string[])
+  NewTagInTagTable(userId, TagName,NewContentID)
 
     await ContentModel.create({
-      userId:UserPassDocument?._id,
+      userId:userId,
       contentID:NewContentID,
       title:title,
       type:type,
@@ -83,12 +85,12 @@ export const NewContentInContentandTagTable = async (username:string,title:strin
 
 }
 
-const NewTagInTagTable = async (User:ObjectId | undefined, TagName:string[]) =>{
- 
+const NewTagInTagTable = async (userId:String, TagName:string[],NewContentID:Number) =>{
   try{
      await TagModel.create({
+      contentID:NewContentID,
       TagName:TagName,
-      userId:User
+      userId:userId
     })
   }catch(error){
     // Why throw error - bcz in try catch block, return error means it just swallowed the whole error, it does not propogate it to the NewContentInContentandTagTable, it understand it as a sucessfull resolution of the promise

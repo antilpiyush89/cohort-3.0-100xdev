@@ -21,10 +21,18 @@ const ContentSchema= new Schema({
 })
 
 const TagsSchema= new Schema({
+  contentID:{type:Number,required:true},
   TagName:{type:[String],required:true},
   userId:{type:Types.ObjectId,ref:"user"}
+})
+
+const LinkSchema = new Schema({
+  linkHash:{type:String,required:true},
+  userId:{type:Types.ObjectId,ref:"user"}
+
 })
 
 export const UserModel = model("user",UserSchema)
 export const ContentModel = model("content",ContentSchema)
 export const TagModel = model("tags",TagsSchema)
+export const LinkModel = model("link",LinkSchema)

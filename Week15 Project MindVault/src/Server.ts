@@ -1,12 +1,13 @@
 import express from "express"
 import {string, z} from "zod"
-import { ContentModel, UserModel,TagModel } from "./database";
+import { ContentModel, UserModel,TagModel, LinkModel} from "./database";
 import { HashPasswordGenerator, HashPasswordMatcher } from "./Middleware";
 const JWT_SECRET= "SOULSOCIETY"
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Authentication } from "./Middleware";
 import mongoose from "mongoose";
 import { NewContentInContentandTagTable } from "./Middleware";
+import { v4 } from "uuid";
 const app = express(); // Initializing an empty express application
 app.use(express.json()) // As the user is sending the body in json, hence app.use is used to parse the body
 
@@ -79,7 +80,7 @@ app.post("/api/v1/signin", async (req,res)=>{
     }else{
       const isMatch= await HashPasswordMatcher(password,userFound.password)
       if(isMatch){
-        const token = jwt.sign({username:userFound.username},JWT_SECRET)
+        const token = jwt.sign({userId:userFound._id},JWT_SECRET)
 
         res.status(200).json({
           message:"Login Successful",
@@ -108,39 +109,15 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
     // the ? represent that it may have null|undefined basically setting it as optional
     // then accessing the property of jwtPayload which is username
     // if req.user as string, we say it has a string type
-    const username=  (req.user as jwt.JwtPayload)?.username
+    const userId=  req.user as string
     const TagName = req.body.tags
-    console.log("User: ",username)
-    // const User = await UserModel.findOne({username:username})
+    console.log("User: ",userId)
 
-    // User can be possibly be null, so you have to handle it
-    // if(User) means if user is not null
-    // For database error it would go in catch(e)
-    // if(User){
-    //   await TagModel.create({
-    //     title:tags,
-    //     userId:User._id
-    //   })
-    //   await ContentModel.create({
-    //     userId:User._id,
-    //     title:title,
-    //     type:type,
-    //     link:link,
-    //   })
-    //   res.status(200).json({
-    //     msg:"Content added successfully"
-    //   })
-    // I have added try and catch in the below function, so this function can throw an error if something goes wrong, and the code execution flow will goes to the below  catch
-    await NewContentInContentandTagTable(username,title,type,link,TagName) // Bcz it is an async function, need to await it to check if their is successfull resolution of promise
+    await NewContentInContentandTagTable(userId,title,type,link,TagName) // Bcz it is an async function, need to await it to check if their is successfull resolution of promise
     res.status(200).json({
       msg:"Content Added sucessfully"
     })
-    // }else{
-    //   //If User is null it would go here, 404 not found in Database
-    //   res.status(404).json({
-    //     msg:"User doesn't exist, 404 not found"
-    //   })
-    // }
+
 
   }catch(e){
     res.status(500).json({
@@ -155,16 +132,15 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
 })
 app.get("/api/v1/content",Authentication,async(req,res) =>{
   try{
-    const user = ( req.user as jwt.JwtPayload)?.username
-    const UserTable =  await UserModel.findOne({username:user})
-      const ContentTable = await ContentModel.findOne({userId:UserTable?._id}) // this ? is for optional cases for what if UserTable if null | undefined what if couldn't find user with username:user
-      const TagsTable = await TagModel.findOne({userId:UserTable?._id})
+    const userId = req.user as string
+    // const UserTable =  await UserModel.findOne({username:user})
+      const ContentTable = await ContentModel.find({userId:userId}) // this ? is for optional cases where, what if UserTable is null | undefined, what if couldn't find user with username:user
+      const TagsTable = await TagModel.find({userId:userId})
       res.status(200).json({
         msg:"Content Fetched Successfully",
-        title:ContentTable?.title,
-        type:ContentTable?.type,
-        link:ContentTable?.link,
-        tags:TagsTable?.TagName
+
+        Content:ContentTable,
+        Tags:TagsTable
       })
     }catch(e){
       res.status(500).json({
@@ -175,14 +151,79 @@ app.get("/api/v1/content",Authentication,async(req,res) =>{
 
 })
 
-app.delete("/api/v1/content",Authentication,(req,res)=>{
+app.delete("/api/v1/content",Authentication,async (req,res)=>{
+  try{
+    const contentID = req.body.contentID
+    const ContentDeleted = await ContentModel.findOneAndDelete({contentID:contentID})
+    const TagsDeleted= await TagModel.findOneAndDelete({contentID:contentID})
+    if(ContentDeleted && TagsDeleted){
+      res.status(200).json({
+        msg:"Content and its Tag Deleted Sucessfully"
+      })
+    }else{
+      res.status(404).json({
+        msg:"Content you want to delete doesn't exist"
+      })
+    }
+
+  }catch(error){
+    res.status(500).json({
+      msg:"Internal Server Error",
+      error:error
+    })
+  }
   
 })
-app.post("/api/brain/share",Authentication,(req,res)=>{
-  
+app.post("/api/brain/share",Authentication,async (req,res)=>{
+  try{
+    const share = req.body.share
+    console.log(req.user)
+    if(share){
+      const id = v4()
+      console.log("UUID: ", id)
+      await LinkModel.create({
+        linkHash:id,
+        userId:req.user
+      })
+      res.status(200).json({
+        msg:"Sharing is enabled",
+        linkHash:id
+      })
+    }else{
+      res.status(300).json({
+        msg:"Cannot share, as share=false"
+      })
+    }
+  }catch(e){
+    res.status(500).json({
+      msg:"Internal Server Error"
+    })
+  }
 })
-app.get("/api/brain/:sharelink",Authentication,(req,res)=>{
-  
+app.get("/api/brain/:sharelink",Authentication,async (req,res)=>{
+  try{
+    const sharelink = req.params.sharelink
+    console.log("sharelink: ",sharelink)
+    const LinkTableFound= await LinkModel.findOne({linkHash:sharelink})
+    if(LinkTableFound){
+      const userId=LinkTableFound.userId
+      const ContentFound=await ContentModel.find({userId:userId})
+      const Username = await UserModel.findOne({_id:userId})
+      console.log("userId: ",userId)
+      res.status(200).json({
+        msg:"Brain fetched Sucessfully",
+        Brain:{username:Username?.username, Content: ContentFound}
+      })
+    }else{
+      res.status(400).json({
+        msg:"Invalid Link provided"
+      })
+    }
+  }catch(error){
+    res.status(500).json({
+      msg:"Internal Server Error"
+    })
+  }
 })
 
 app.listen(3000)
