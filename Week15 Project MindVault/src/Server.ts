@@ -6,7 +6,7 @@ const JWT_SECRET= "SOULSOCIETY"
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Authentication } from "./Middleware";
 import mongoose from "mongoose";
-
+import { NewContentInContentandTagTable } from "./Middleware";
 const app = express(); // Initializing an empty express application
 app.use(express.json()) // As the user is sending the body in json, hence app.use is used to parse the body
 
@@ -109,38 +109,43 @@ app.post("/api/v1/content",Authentication,async (req,res)=>{
     // then accessing the property of jwtPayload which is username
     // if req.user as string, we say it has a string type
     const username=  (req.user as jwt.JwtPayload)?.username
-    const tags = req.body.tags
+    const TagName = req.body.tags
     console.log("User: ",username)
-    const User = await UserModel.findOne({username:username})
+    // const User = await UserModel.findOne({username:username})
 
     // User can be possibly be null, so you have to handle it
     // if(User) means if user is not null
     // For database error it would go in catch(e)
-    if(User){
-      await TagModel.create({
-        title:tags,
-        userId:User._id
-      })
-      await ContentModel.create({
-        userId:User._id,
-        title:title,
-        type:type,
-        link:link,
-      })
-      res.status(200).json({
-        msg:"Content added successfully"
-      })
-    }else{
-      //If User is null it would go here, 404 not found in Database
-      res.status(404).json({
-        msg:"User doesn't exist, 404 not found"
-      })
-    }
+    // if(User){
+    //   await TagModel.create({
+    //     title:tags,
+    //     userId:User._id
+    //   })
+    //   await ContentModel.create({
+    //     userId:User._id,
+    //     title:title,
+    //     type:type,
+    //     link:link,
+    //   })
+    //   res.status(200).json({
+    //     msg:"Content added successfully"
+    //   })
+    // I have added try and catch in the below function, so this function can throw an error if something goes wrong, and the code execution flow will goes to the below  catch
+    await NewContentInContentandTagTable(username,title,type,link,TagName) // Bcz it is an async function, need to await it to check if their is successfull resolution of promise
+    res.status(200).json({
+      msg:"Content Added sucessfully"
+    })
+    // }else{
+    //   //If User is null it would go here, 404 not found in Database
+    //   res.status(404).json({
+    //     msg:"User doesn't exist, 404 not found"
+    //   })
+    // }
 
   }catch(e){
     res.status(500).json({
       msg:"Internal Server Error",
-      err:e
+      err: e
     })
   }
 
@@ -159,7 +164,7 @@ app.get("/api/v1/content",Authentication,async(req,res) =>{
         title:ContentTable?.title,
         type:ContentTable?.type,
         link:ContentTable?.link,
-        tags:TagsTable?.title
+        tags:TagsTable?.TagName
       })
     }catch(e){
       res.status(500).json({

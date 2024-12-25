@@ -1,5 +1,11 @@
 import * as argon2 from "argon2"
 import { Request, Response, NextFunction } from "express"
+import { Mongoose, ObjectId } from "mongoose"
+import  jwt  from "jsonwebtoken"
+import { ContentModel, TagModel, UserModel } from "./database"
+import { string } from "zod"
+const JWT_SECRET="SOULSOCIETY"
+
 
 // Extend the Request interface to include the user property
 
@@ -7,20 +13,19 @@ import { Request, Response, NextFunction } from "express"
 declare module "express-serve-static-core" {
   interface Request {
     user?: string | jwt.JwtPayload
-  }
-}
-import  jwt  from "jsonwebtoken"
-const JWT_SECRET="SOULSOCIETY"
-export const HashPasswordGenerator =async (PlainTextpassword:string)=>{
+  }}
 
+
+
+export const HashPasswordGenerator =async (PlainTextpassword:string)=>{
   return await argon2.hash(PlainTextpassword)
 }
+
 export const HashPasswordMatcher = async (PlainTextpassword:string,hashpassword:string)=>{
   return await argon2.verify(hashpassword,PlainTextpassword)
 }
 
 export const Authentication = (req:Request,res:Response,next:NextFunction)=>{
-  
   try{
     const token = req.headers["token"] as string
     console.log("Token:   ",token)
@@ -48,5 +53,49 @@ export const Authentication = (req:Request,res:Response,next:NextFunction)=>{
 // Learning -1. Code execution goes to catch(error) when you provide an invalid token (eg. some letter missing in token)
 //           2. Code execution goes to !token when token is null/ you have provided empty token field
   
+}
+
+
+
+export const NewContentInContentandTagTable = async (username:string,title:string,type:string,link:string,TagName:string[])=>{
+  try{
+  const UserPassDocument = await UserModel.findOne({username:username})
+  // fetches the latest document with latestContentID, as -1 represent the last element
+  const latestContentID = await ContentModel.findOne({userId:UserPassDocument?._id}).sort({contentID:-1}).select('contentID') 
+  // If contentID exist it will add 1 to it, else sets a default value of 1 to contentID
+  const NewContentID = latestContentID ? latestContentID.contentID + 1: 1
+  console.log(NewContentID)
+
+  NewTagInTagTable(UserPassDocument?._id as ObjectId | undefined, TagName as string[])
+
+    await ContentModel.create({
+      userId:UserPassDocument?._id,
+      contentID:NewContentID,
+      title:title,
+      type:type,
+      link:link,
+    })
+  }catch(error){
+      // Why throw error - bcz in try catch block, return error means it just swallowed the whole error, it does not propogate it to the NewContentInContentandTagTable, it understand it as a sucessfull resolution of the promise
+      // Hence need to throw error- so NewContentInContentandTagTable function understand their is unsucessful resolution of the promise
+      throw error
+  }
+
+}
+
+const NewTagInTagTable = async (User:ObjectId | undefined, TagName:string[]) =>{
+ 
+  try{
+     await TagModel.create({
+      TagName:TagName,
+      userId:User
+    })
+  }catch(error){
+    // Why throw error - bcz in try catch block, return error means it just swallowed the whole error, it does not propogate it to the NewContentInContentandTagTable, it understand it as a sucessfull resolution of the promise
+    // Hence need to throw error- so NewContentInContentandTagTable function understand their is unsucessful resolution of the promise 
+    throw error
+  }
+
+
 }
 
