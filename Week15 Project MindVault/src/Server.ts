@@ -8,8 +8,10 @@ import { Authentication } from "./Middleware";
 import mongoose from "mongoose";
 import { NewContentInContentandTagTable } from "./Middleware";
 import { v4 } from "uuid";
+import cors from "cors"
 const app = express(); // Initializing an empty express application
 app.use(express.json()) // As the user is sending the body in json, hence app.use is used to parse the body
+app.use(cors())
 
 
 
@@ -156,7 +158,7 @@ app.delete("/api/v1/content",Authentication,async (req,res)=>{
     const contentID = req.body.contentID
     const ContentDeleted = await ContentModel.findOneAndDelete({contentID:contentID})
     const TagsDeleted= await TagModel.findOneAndDelete({contentID:contentID})
-    if(ContentDeleted && TagsDeleted){
+    if(ContentDeleted || TagsDeleted){
       res.status(200).json({
         msg:"Content and its Tag Deleted Sucessfully"
       })
@@ -190,6 +192,9 @@ app.post("/api/brain/share",Authentication,async (req,res)=>{
         linkHash:id
       })
     }else{
+      await LinkModel.deleteOne({
+        userId:req.user
+      })
       res.status(300).json({
         msg:"Cannot share, as share=false"
       })

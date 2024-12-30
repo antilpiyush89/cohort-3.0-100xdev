@@ -10,7 +10,7 @@ const UserSchema=new Schema({
 })
 
 // 2. CONTENT SCHEMA
-const ContentType = ['image','audio','video','article']
+const ContentType = ['image','audio','youtube','article','twitter']
 const ContentSchema= new Schema({
   contentID:{type:Number,required:true},
   title:{type:String,required:true},
@@ -22,7 +22,7 @@ const ContentSchema= new Schema({
 
 const TagsSchema= new Schema({
   contentID:{type:Number,required:true},
-  TagName:{type:[String],required:true},
+  TagName:{type:[String]},
   userId:{type:Types.ObjectId,ref:"user"}
 })
 
