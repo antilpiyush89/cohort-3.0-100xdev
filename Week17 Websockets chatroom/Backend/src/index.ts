@@ -40,6 +40,7 @@ wss.on("connection",function(socket){
   console.log("socket array length: ",socketarr.length)
   socket.on("message",function(message){
     for(let i=0;i<socketarr.length;i++){
+      console.log("Message received from client: ",message.toString())
       socketarr[i].send(message.toString()); // sends the message received from one client to all the clients, as it iterates over differenct sockets connection
     }
 
