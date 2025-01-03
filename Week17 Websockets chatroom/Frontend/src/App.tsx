@@ -7,7 +7,7 @@ export default function App(){
   const inputref = useRef<HTMLInputElement>(null)
   const [socket, setSocket] = useState<WebSocket | null>(null)
   const [messageArr,setmessageArr] = useState<string[]>([])
-
+  let right=true
   function sendRoomIDToBackend(){
     socket?.send(`{
       "type":"join",
@@ -60,10 +60,20 @@ export default function App(){
     <div className = "flex flex-col w-screen h-screen justify-center items-center pt-0">
       <button className="p-4 rounded-lg bg-black text-white text-xl mb-5" onClick={sendRoomIDToBackend}>Join Jaat Room</button>
       <div className="flex flex-col justify-between h-2/3 w-2/3 bg-gray-200 p-4 rounded-lg">
-      <div className="flex flex-col items-end pr-5 h-5/6 w-full bg-red-300 overflow-y-scroll">
-      {messageArr.map((message, index) => (
-        <div key={index} className="p-2 font-medium text-xl bg-yellow-100 w-fit h-fit rounded mb-2 mt-4">{message}</div>
-      ))}
+      <div className=" pr-5 h-5/6 w-full bg-red-300 overflow-y-scroll">
+      {messageArr.map((message, index) => {
+        console.log(inputref.current?.value != message);
+        return (
+          <div key={index}>
+            <div className="flex justify-end">
+              <div className="p-2 font-medium text-xl bg-yellow-100 w-fit h-fit rounded mb-2 mt-4">{inputref.current?.value}</div>
+            </div>
+            <div className="flex">
+              <div className={inputref.current?.value != message ? "ml-2 p-2 font-medium text-xl bg-yellow-100 w-fit h-fit rounded mb-2 mt-4" : "hidden"}>{message}</div>
+            </div>
+          </div>
+        );
+      })}
       </div>
 
       <div className="w-full flex justify-center items-center">
