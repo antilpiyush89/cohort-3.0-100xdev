@@ -1,8 +1,7 @@
 import {Client} from "pg"
+import express from "express"
 
 const newclient = new Client("postgresql://Testdb_owner:rC8yi6FsndgE@ep-delicate-wind-a1ujx14k.ap-southeast-1.aws.neon.tech/Testdb?sslmode=require") // an instance of postgressDB is initialized 
-
-
 
 
 // Basic Implementation of postgress
@@ -25,3 +24,43 @@ const newclient = new Client("postgresql://Testdb_owner:rC8yi6FsndgE@ep-delicate
 // }
 
 // TableCreation()
+
+
+
+// Ex-2 sending data using express
+// const app = express() //instance of express
+// app.use(express.json()) // to parse string to json
+
+
+// app.post("/insertdata",async (req,res)=>{
+//   try{
+//     const name = req.body.name
+//     const age = req.body.age
+//     const classname = req.body.classname
+//     console.log(name,age,classname)
+//     // to prevent sql injection
+//     await newclient.connect() // connect with the postgress db
+//     const response = await newclient.query(`INSERT INTO STUDENTS (NAME,AGE,CLASS) VALUES($1,$2,$3)`,[name,age,classname])
+//     console.log(response)
+//     if(response){
+//       res.status(200).json({
+//         msg:"Data entered in the table"
+//       })
+//     }else{
+//       res.status(401).json({
+//         msg:"Something failed"
+//       })
+//     }
+      
+//   }catch(e){
+//     res.status(500).json({
+//       error:e
+//     })
+
+//   }
+
+
+// })
+
+
+// app.listen(3000)
