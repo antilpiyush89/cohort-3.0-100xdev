@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const express_1 = __importDefault(require("express"));
 const client = new client_1.PrismaClient();
 // async function insertdata(){
 //   // To send multiple queries together
@@ -35,18 +39,55 @@ const client = new client_1.PrismaClient();
 //   console.log(result)
 // }
 // insertdata()
-function insertdata() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // To find 
-        const result = yield client.user.findMany({
-            where: {
-                id: 1
-            },
-            include: {
-                Todos: true
-            }
-        });
-        console.log(result, result[0].Todos);
+// To find this data
+// async function insertdata(){
+//   // To find 
+//   const result =await client.user.findMany({
+//     where:{
+//       id:1
+//     },
+//     include:{
+//       Todos:true
+//     }
+//   }
+//   )
+//   console.log(result,result[0].Todos)
+// }
+// insertdata()
+// Expressifying our application 
+const app = (0, express_1.default)();
+app.use(express_1.default.json());
+app.get("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield client.user.findMany({
+        include: {
+            Todos: true
+        }
     });
-}
-insertdata();
+    console.log(users);
+    res.json({
+        users
+    });
+}));
+app.get("/todo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const userTodo = yield client.user.findMany({
+        where: {
+            id: parseInt(id) // need to parse id from line 63 bcz it is a string, and in our schema id is a integer
+        },
+        include: {
+            Todos: true
+        }
+    });
+    if (userTodo) {
+        res.json({
+            userTodo
+        });
+    }
+    else {
+        res.json({
+            msg: "failed"
+        });
+    }
+    console.log(id, userTodo);
+}));
+app.listen(3000);
