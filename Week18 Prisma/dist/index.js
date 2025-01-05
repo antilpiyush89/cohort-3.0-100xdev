@@ -11,14 +11,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const client = new client_1.PrismaClient();
+// async function insertdata(){
+//   // To send multiple queries together
+//   const result =await client.user.create({
+//     data:{
+//       username:"antilpiyush89",
+//       email:"antilpiyush89@gmail.com",
+//       password:"expert4268",
+//       firstname:"piyush",
+//       Lastname:"antil",
+//       Todos:{
+//         create:[
+//           {
+//             title:"first todo",
+//             description:"description",
+//             done:false
+//           }
+//         ]
+//       }
+//     }
+//   }
+//   )
+//   console.log(result)
+// }
+// insertdata()
 function insertdata() {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield client.todo.findFirst({
+        // To find 
+        const result = yield client.user.findMany({
             where: {
-                userid: 1
+                id: 1
+            },
+            include: {
+                Todos: true
             }
         });
-        console.log(result);
+        console.log(result, result[0].Todos);
     });
 }
 insertdata();

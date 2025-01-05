@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+// way to define a one to many relation in prisma
 model user{
   id Int @id @default(autoincrement())
   username String @unique
@@ -16,10 +16,13 @@ model user{
   password String
   firstname String
   Lastname String
+  Todos todo[] // one user can have multiple todos, this depicts that
 }
 model todo{
-  userid Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+  userid Int 
   title String
   description String
   done Boolean
+  user user @relation(fields: [userid],references: [id]) // way to define a foreign key in prisma, user is of type user
 }
