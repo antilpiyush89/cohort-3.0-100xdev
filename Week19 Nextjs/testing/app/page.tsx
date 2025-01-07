@@ -37,9 +37,26 @@ import axios from "axios"
 
 // When server rendering don't use -> "use client"
 // Server side rendering -> nextJS server sends the backend request, get the data and returns to the client in a single request, no waterfalling problem, all the rendering happens on the server side, server serves the html directly to the server
+// export default async function home(){
+
+//     const response = await axios.get("https://jsonplaceholder.typicode.com/posts/1")
+//     const data:{userId:string,title:string} = response.data as any
+
+//     return(
+//       <div>
+//         {data.userId}
+//         {data.title}
+//       </div>
+//     )
+//   }
+
+
 export default async function home(){
 
-    const response = await axios.get("https://jsonplaceholder.typicode.com/posts/1")
+    const response = await axios.get("http://localhost:3000/api/v1/user/details")
+
+
+    await new Promise(r=> setTimeout(r,5000))
     const data:{userId:string,title:string} = response.data as any
 
     return(
